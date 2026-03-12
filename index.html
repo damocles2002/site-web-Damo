@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SHAKER – La communauté des bartenders</title>
+<style>
+:root {
+  --gold: #C9A84C;
+  --gold2: #E8C97A;
+  --black: #080808;
+  --dark: #101010;
+  --dark2: #181818;
+  --dark3: #222;
+  --white: #F5F0E8;
+  --gray: #888;
+  --green: #2ECC71;
+  --red: #E74C3C;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: Georgia, 'Times New Roman', serif;
+  min-height: 100vh;
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  position: fixed; top:0; left:0; right:0; z-index:200;
+  height: 60px;
+  background: rgba(8,8,8,0.97);
+  border-bottom: 1px solid rgba(201,168,76,0.15);
+  display: flex; align-items:center; justify-content:space-between;
+  padding: 0 24px;
+  backdrop-filter: blur(10px);
+}
+.logo {
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  color: var(--gold);
+  font-family: Georgia, serif;
+}
+.logo span { color: var(--white); font-weight:300; font-size:0.7rem; letter-spacing:0.3em; display:block; margin-top:-4px; }
+.topbar-nav { display:flex; gap:6px; }
+.tab-btn {
+  background: none; border:none;
+  color: var(--gray);
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.3s;
+  font-family: Georgia, serif;
+}
+.tab-btn.active, .tab-btn:hover { color: var(--gold); background: rgba(201,168,76,0.08); }
+.topbar-actions { display:flex; gap:10px; align-items:center; }
+.btn-login {
+  background: none;
+  border: 1px solid rgba(201,168,76,0.4);
+  color: var(--gold);
+  padding: 7px 18px;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-family: Georgia, serif;
+}
+.btn-login:hover { background: var(--gold); color: var(--black); }
+.btn-post {
+  background: var(--gold);
+  border: none;
+  color: var(--black);
+  padding: 8px 18px;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s;
+  font-family: Georgia, serif;
+}
+.btn-post:hover { background: var(--gold2); }
+
+/* ── LAYOUT ── */
+.app { margin-top: 60px; display:flex; min-height: calc(100vh - 60px); }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 260px; min-width:260px;
+  background: var(--dark);
+  border-right: 1px solid rgba(201,168,76,0.1);
+  padding: 30px 20px;
+  position: sticky; top:60px; height: calc(100vh - 60px);
+  overflow-y: auto;
+}
+.sidebar-section { margin-bottom: 36px; }
+.sidebar-title {
+  font-size: 0.55rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(201,168,76,0.1);
+}
+.sidebar-link {
+  display: flex; align-items:center; gap:10px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  color: var(--gray);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 4px;
+  text-decoration: none;
+}
+.sidebar-link:hover, .sidebar-link.active { color:var(--white); background: rgba(201,168,76,0.07); }
+.sidebar-link .icon { font-size:1rem; width:20px; text-align:center; }
+.tag-list { display:flex; flex-wrap:wrap; gap:6px; }
+.tag {
+  font-size: 0.65rem;
+  padding: 4px 10px;
+  border: 1px solid rgba(201,168,76,0.2);
+  color: var(--gold);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.1em;
+}
+.tag:hover { background: rgba(201,168,76,0.15); }
+
+/* ── MAIN ── */
+.main { flex:1; max-width: 680px; padding: 30px 24px; margin: 0 auto; }
+
+/* ── PAGE SECTIONS ── */
+.page { display:none; }
+.page.active { display:block; }
+
+/* ── STORIES ── */
+.stories {
+  display:flex; gap:14px; overflow-x:auto; padding-bottom:12px; margin-bottom:28px;
+  scrollbar-width: none;
+}
+.stories::-webkit-scrollbar { display:none; }
+.story {
+  min-width: 72px; text-align:center; cursor:pointer;
+}
+.story-ring {
+  width: 64px; height:64px; border-radius:50%;
+  border: 2px solid var(--gold);
+  padding: 2px;
+  margin: 0 auto 6px;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  display:flex; align-items:center; justify-content:center;
+  font-size: 1.6rem;
+  transition: transform 0.2s;
+}
+.story:hover .story-ring { transform: scale(1.08); }
+.story-ring.add { background: var(--dark2); border-color: var(--gray); }
+.story-name { font-size:0.6rem; color:var(--gray); letter-spacing:0.05em; }
+
+/* ── POST CARD ── */
+.post-card {
+  background: var(--dark2);
+  border: 1px solid rgba(201,168,76,0.08);
+  border-radius: 2px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+.post-card:hover { border-color: rgba(201,168,76,0.2); }
+.post-header {
+  display:flex; align-items:center; gap:12px;
+  padding: 14px 16px;
+}
+.avatar {
+  width:40px; height:40px; border-radius:50%;
+  background: linear-gradient(135deg, var(--gold-dark,#8B6914), var(--gold));
+  display:flex; align-items:center; justify-content:center;
+  font-size: 1rem; font-weight:bold; color:var(--black);
+  flex-shrink:0;
+}
+.post-meta { flex:1; }
+.post-author { font-size:0.85rem; font-weight:bold; color:var(--white); }
+.post-time { font-size:0.7rem; color:var(--gray); margin-top:2px; }
+.post-badge {
+  font-size:0.55rem; letter-spacing:0.15em; text-transform:uppercase;
+  padding: 3px 8px;
+  border: 1px solid rgba(201,168,76,0.3);
+  color: var(--gold);
+  border-radius: 20px;
+}
+.post-img {
+  width:100%; aspect-ratio:4/3; object-fit:cover;
+  background: linear-gradient(135deg, var(--dark3), #1a1200);
+  display:flex; align-items:center; justify-content:center;
+  font-size:5rem;
+  cursor:pointer;
+}
+.post-img.tall { aspect-ratio: 3/4; }
+.post-body { padding: 14px 16px; }
+.post-cocktail-name {
+  font-size:1.1rem; font-weight:bold;
+  color: var(--gold); margin-bottom:6px;
+}
+.post-desc { font-size:0.85rem; color:var(--gray); line-height:1.7; margin-bottom:12px; }
+.post-ingredients {
+  display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px;
+}
+.ingr {
+  font-size:0.6rem; padding:3px 9px;
+  border:1px solid rgba(255,255,255,0.1);
+  color:var(--gray); border-radius:20px;
+  letter-spacing:0.05em;
+}
+.post-actions {
+  display:flex; align-items:center; gap:20px;
+  padding: 10px 16px 14px;
+  border-top: 1px solid rgba(255,255,255,0.04);
+}
+.action-btn {
+  background:none; border:none; color:var(--gray);
+  font-size:0.8rem; cursor:pointer;
+  display:flex; align-items:center; gap:6px;
+  transition: color 0.2s;
+  font-family: Georgia, serif;
+}
+.action-btn:hover { color:var(--white); }
+.action-btn.liked { color: var(--red); }
+.action-btn.saved { color: var(--gold); }
+.action-icon { font-size:1.1rem; }
+
+/* COMMENTS */
+.comments-section {
+  border-top: 1px solid rgba(255,255,255,0.04);
+  padding: 0 16px 14px;
+}
+.comment {
+  display:flex; gap:10px; margin-top:12px;
+}
+.comment-avatar {
+  width:28px; height:28px; border-radius:50%;
+  background: var(--dark3);
+  display:flex; align-items:center; justify-content:center;
+  font-size:0.7rem; flex-shrink:0;
+}
+.comment-body { flex:1; }
+.comment-author { font-size:0.75rem; font-weight:bold; color:var(--white); }
+.comment-text { font-size:0.8rem; color:var(--gray); margin-top:2px; line-height:1.5; }
+.comment-time { font-size:0.65rem; color:rgba(136,136,136,0.5); margin-top:3px; }
+.comment-input-row {
+  display:flex; gap:10px; align-items:center; margin-top:14px;
+}
+.comment-input {
+  flex:1; background:rgba(255,255,255,0.04); border:none;
+  border-bottom: 1px solid rgba(201,168,76,0.2);
+  color:var(--white); padding:8px 0;
+  font-size:0.8rem; font-family:Georgia,serif;
+  outline:none; transition: border-color 0.3s;
+}
+.comment-input:focus { border-bottom-color: var(--gold); }
+.comment-input::placeholder { color:var(--gray); }
+.comment-send {
+  background:none; border:none; color:var(--gold);
+  font-size:0.7rem; letter-spacing:0.15em; text-transform:uppercase;
+  cursor:pointer; font-family:Georgia,serif;
+  transition: color 0.2s;
+}
+.comment-send:hover { color:var(--gold2); }
+
+/* ── CREATE POST FORM ── */
+.create-box {
+  background:var(--dark2); border:1px solid rgba(201,168,76,0.15);
+  border-radius:2px; padding:20px; margin-bottom:28px;
+}
+.create-title { font-size:0.7rem; letter-spacing:0.3em; text-transform:uppercase; color:var(--gold); margin-bottom:16px; }
+.create-upload {
+  border: 2px dashed rgba(201,168,76,0.2);
+  border-radius:2px; padding:40px;
+  text-align:center; cursor:pointer;
+  transition: border-color 0.3s; margin-bottom:14px;
+}
+.create-upload:hover { border-color: var(--gold); }
+.create-upload-icon { font-size:2.5rem; margin-bottom:8px; }
+.create-upload-text { font-size:0.8rem; color:var(--gray); }
+.input-field {
+  width:100%; background:transparent;
+  border:none; border-bottom: 1px solid rgba(201,168,76,0.2);
+  color:var(--white); padding:10px 0;
+  font-size:0.9rem; font-family:Georgia,serif;
+  outline:none; margin-bottom:14px;
+  transition:border-color 0.3s;
+}
+.input-field:focus { border-bottom-color:var(--gold); }
+.input-field::placeholder { color:var(--gray); }
+.input-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.btn-submit {
+  background:var(--gold); border:none; color:var(--black);
+  padding:12px 30px; font-size:0.75rem; letter-spacing:0.2em;
+  text-transform:uppercase; cursor:pointer; font-weight:bold;
+  font-family:Georgia,serif; transition:background 0.3s; width:100%;
+}
+.btn-submit:hover { background:var(--gold2); }
+
+/* ── JOBS PAGE ── */
+.jobs-header { margin-bottom:28px; }
+.jobs-title { font-size:1.8rem; font-weight:bold; margin-bottom:6px; }
+.jobs-sub { font-size:0.85rem; color:var(--gray); }
+.jobs-filters { display:flex; gap:8px; flex-wrap:wrap; margin-top:16px; }
+.filter-btn {
+  background:none; border:1px solid rgba(255,255,255,0.1);
+  color:var(--gray); padding:7px 16px; font-size:0.7rem;
+  letter-spacing:0.1em; text-transform:uppercase;
+  cursor:pointer; transition:all 0.2s; font-family:Georgia,serif;
+  border-radius:20px;
+}
+.filter-btn.active, .filter-btn:hover { border-color:var(--gold); color:var(--gold); }
+
+.job-card {
+  background:var(--dark2); border:1px solid rgba(201,168,76,0.08);
+  padding:24px; margin-bottom:16px;
+  transition:all 0.3s; cursor:pointer;
+}
+.job-card:hover { border-color:rgba(201,168,76,0.3); transform:translateY(-2px); }
+.job-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; }
+.job-title { font-size:1.05rem; font-weight:bold; color:var(--white); margin-bottom:4px; }
+.job-company { font-size:0.8rem; color:var(--gold); }
+.job-type {
+  font-size:0.6rem; padding:4px 12px; border-radius:20px;
+  letter-spacing:0.15em; text-transform:uppercase; font-weight:bold;
+  flex-shrink:0;
+}
+.job-type.long { background:rgba(46,204,113,0.1); color:var(--green); border:1px solid rgba(46,204,113,0.2); }
+.job-type.short { background:rgba(201,168,76,0.1); color:var(--gold); border:1px solid rgba(201,168,76,0.2); }
+.job-type.event { background:rgba(231,76,60,0.1); color:var(--red); border:1px solid rgba(231,76,60,0.2); }
+.job-desc { font-size:0.82rem; color:var(--gray); line-height:1.7; margin-bottom:14px; }
+.job-tags { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
+.job-tag { font-size:0.6rem; padding:3px 10px; border:1px solid rgba(255,255,255,0.08); color:var(--gray); border-radius:20px; }
+.job-bottom { display:flex; align-items:center; justify-content:space-between; }
+.job-info { display:flex; gap:16px; }
+.job-info-item { font-size:0.72rem; color:var(--gray); display:flex; align-items:center; gap:5px; }
+.btn-apply {
+  background:none; border:1px solid var(--gold); color:var(--gold);
+  padding:8px 20px; font-size:0.7rem; letter-spacing:0.15em;
+  text-transform:uppercase; cursor:pointer; transition:all 0.3s;
+  font-family:Georgia,serif;
+}
+.btn-apply:hover { background:var(--gold); color:var(--black); }
+
+.post-job-btn {
+  background:var(--dark2); border:2px dashed rgba(201,168,76,0.2);
+  width:100%; padding:24px; text-align:center; cursor:pointer;
+  color:var(--gold); font-size:0.8rem; letter-spacing:0.2em;
+  text-transform:uppercase; transition:all 0.3s; margin-bottom:20px;
+  font-family:Georgia,serif;
+}
+.post-job-btn:hover { border-color:var(--gold); background:rgba(201,168,76,0.05); }
+
+/* ── RIGHT PANEL ── */
+.right-panel { width:300px; min-width:300px; padding:30px 20px; }
+.widget { background:var(--dark2); border:1px solid rgba(201,168,76,0.08); padding:20px; margin-bottom:20px; }
+.widget-title { font-size:0.6rem; letter-spacing:0.3em; text-transform:uppercase; color:var(--gold); margin-bottom:16px; }
+.trending-item { display:flex; align-items:center; gap:12px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.04); }
+.trending-item:last-child { border-bottom:none; }
+.trending-num { font-size:1.2rem; font-weight:bold; color:rgba(201,168,76,0.2); font-family:Georgia,serif; width:24px; }
+.trending-name { font-size:0.85rem; color:var(--white); flex:1; }
+.trending-count { font-size:0.7rem; color:var(--gray); }
+.bartender-item { display:flex; align-items:center; gap:12px; padding:8px 0; }
+.bartender-avatar { width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,var(--dark3),var(--gold)); display:flex; align-items:center; justify-content:center; font-size:0.9rem; }
+.bartender-name { font-size:0.82rem; color:var(--white); font-weight:bold; }
+.bartender-city { font-size:0.7rem; color:var(--gray); }
+.btn-follow { background:none; border:1px solid rgba(201,168,76,0.3); color:var(--gold); padding:4px 12px; font-size:0.6rem; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; transition:all 0.2s; font-family:Georgia,serif; }
+.btn-follow:hover { background:var(--gold); color:var(--black); }
+
+/* ── MODAL ── */
+.modal-overlay {
+  display:none; position:fixed; inset:0; z-index:500;
+  background:rgba(0,0,0,0.85); backdrop-filter:blur(6px);
+  align-items:center; justify-content:center;
+}
+.modal-overlay.open { display:flex; }
+.modal {
+  background:var(--dark); border:1px solid rgba(201,168,76,0.2);
+  width:100%; max-width:440px; padding:40px;
+  position:relative;
+}
+.modal-close {
+  position:absolute; top:16px; right:16px;
+  background:none; border:none; color:var(--gray);
+  font-size:1.2rem; cursor:pointer; transition:color 0.2s;
+}
+.modal-close:hover { color:var(--white); }
+.modal-title { font-size:1.4rem; font-weight:bold; margin-bottom:6px; }
+.modal-sub { font-size:0.82rem; color:var(--gray); margin-bottom:28px; }
+.modal-tabs { display:flex; gap:0; margin-bottom:28px; }
+.modal-tab {
+  flex:1; padding:10px; background:none; border:1px solid rgba(201,168,76,0.15);
+  color:var(--gray); font-size:0.75rem; letter-spacing:0.15em; text-transform:uppercase;
+  cursor:pointer; transition:all 0.2s; font-family:Georgia,serif;
+}
+.modal-tab.active { background:var(--gold); color:var(--black); border-color:var(--gold); font-weight:bold; }
+
+/* ── TOAST ── */
+.toast {
+  position:fixed; bottom:30px; right:30px; z-index:999;
+  background:var(--dark2); border:1px solid var(--gold);
+  padding:14px 24px; font-size:0.8rem; color:var(--white);
+  transform:translateY(100px); opacity:0;
+  transition:all 0.4s cubic-bezier(0.23,1,0.32,1);
+}
+.toast.show { transform:translateY(0); opacity:1; }
+
+@media(max-width:1100px) { .right-panel { display:none; } }
+@media(max-width:768px) { .sidebar { display:none; } .app { display:block; } }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">SHAKER <span>La communauté des bartenders</span></div>
+  <nav class="topbar-nav">
+    <button class="tab-btn active" onclick="showPage('feed',this)">🍸 Feed</button>
+    <button class="tab-btn" onclick="showPage('jobs',this)">💼 Emplois</button>
+    <button class="tab-btn" onclick="showPage('post',this)">✦ Poster</button>
+  </nav>
+  <div class="topbar-actions">
+    <button class="btn-login" onclick="openModal()">Connexion</button>
+    <button class="btn-post" onclick="openModal()">Rejoindre</button>
+  </div>
+</div>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-title">Navigation</div>
+      <a class="sidebar-link active" onclick="showPage('feed',null)"><span class="icon">🏠</span> Accueil</a>
+      <a class="sidebar-link" onclick="showPage('jobs',null)"><span class="icon">💼</span> Offres d'emploi</a>
+      <a class="sidebar-link" onclick="showPage('post',null)"><span class="icon">📸</span> Poster un cocktail</a>
+      <a class="sidebar-link"><span class="icon">🔖</span> Mes sauvegardes</a>
+      <a class="sidebar-link"><span class="icon">👤</span> Mon profil</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">Catégories</div>
+      <div class="tag-list">
+        <span class="tag">#classiques</span>
+        <span class="tag">#créations</span>
+        <span class="tag">#tropical</span>
+        <span class="tag">#mocktail</span>
+        <span class="tag">#gin</span>
+        <span class="tag">#rhum</span>
+        <span class="tag">#whisky</span>
+        <span class="tag">#vodka</span>
+        <span class="tag">#tequila</span>
+        <span class="tag">#spritz</span>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">Liens rapides</div>
+      <a class="sidebar-link"><span class="icon">🏆</span> Top cocktails</a>
+      <a class="sidebar-link"><span class="icon">🌍</span> Bartenders du monde</a>
+      <a class="sidebar-link"><span class="icon">📅</span> Événements</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- FEED PAGE -->
+    <div id="page-feed" class="page active">
+
+      <!-- Stories -->
+      <div class="stories">
+        <div class="story" onclick="openModal()">
+          <div class="story-ring add">➕</div>
+          <div class="story-name">Ajouter</div>
+        </div>
+        <div class="story"><div class="story-ring">🍹</div><div class="story-name">Damoclès</div></div>
+        <div class="story"><div class="story-ring">🥃</div><div class="story-name">Marco</div></div>
+        <div class="story"><div class="story-ring">🍸</div><div class="story-name">Léa</div></div>
+        <div class="story"><div class="story-ring">🌿</div><div class="story-name">Julien</div></div>
+        <div class="story"><div class="story-ring">🔥</div><div class="story-name">Sofia</div></div>
+        <div class="story"><div class="story-ring">🫧</div><div class="story-name">Antoine</div></div>
+        <div class="story"><div class="story-ring">🌊</div><div class="story-name">Naïa</div></div>
+      </div>
+
+      <!-- Post 1 -->
+      <div class="post-card">
+        <div class="post-header">
+          <div class="avatar" style="background:linear-gradient(135deg,#8B6914,#C9A84C)">D</div>
+          <div class="post-meta">
+            <div class="post-author">Damoclès 🍸</div>
+            <div class="post-time">Il y a 2 heures · Paris</div>
+          </div>
+          <span class="post-badge">Bartender pro</span>
+        </div>
+        <div class="post-img" style="font-size:6rem; background:linear-gradient(135deg,#1a0a00,#2d1a00);">⚔️</div>
+        <div class="post-body">
+          <div class="post-cocktail-name">L'Épée de Damoclès</div>
+          <div class="post-desc">Mon cocktail signature — whisky tourbé, miel sauvage, poivre noir et une larme de chartreuse. Un équilibre parfait entre danger et plaisir. Chaque gorgée est une décision. 🔥</div>
+          <div class="post-ingredients">
+            <span class="ingr">Whisky Tourbé</span>
+            <span class="ingr">Miel Sauvage</span>
+            <span class="ingr">Chartreuse</span>
+            <span class="ingr">Poivre Noir</span>
+            <span class="ingr">Orange Amère</span>
+          </div>
+        </div>
+        <div class="post-actions">
+          <button class="action-btn" onclick="toggleLike(this)"><span class="action-icon">🤍</span> <span class="like-count">247</span></button>
+          <button class="action-btn" onclick="toggleComments('c1')"><span class="action-icon">💬</span> 18 commentaires</button>
+          <button class="action-btn" onclick="toggleSave(this)"><span class="action-icon">🔖</span> Sauvegarder</button>
+          <button class="action-btn" style="margin-left:auto"><span class="action-icon">↗️</span> Partager</button>
+        </div>
+        <div class="comments-section" id="c1" style="display:none">
+          <div class="comment">
+            <div class="comment-avatar">🍋</div>
+            <div class="comment-body">
+              <div class="comment-author">Marco_Bartender</div>
+              <div class="comment-text">Incroyable création ! Le poivre noir avec le miel c'est un mariage divin 🔥</div>
+              <div class="comment-time">il y a 1h</div>
+            </div>
+          </div>
+          <div class="comment">
+            <div class="comment-avatar">🌿</div>
+            <div class="comment-body">
+              <div class="comment-author">Léa_Mix</div>
+              <div class="comment-text">J'ai essayé avec un Laphroaig 10 ans, c'est parfait !</div>
+              <div class="comment-time">il y a 45min</div>
+            </div>
+          </div>
+          <div class="comment-input-row">
+            <input class="comment-input" placeholder="Votre commentaire..." id="ci1">
+            <button class="comment-send" onclick="addComment('c1','ci1')">Envoyer</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Post 2 -->
+      <div class="post-card">
+        <div class="post-header">
+          <div class="avatar" style="background:linear-gradient(135deg,#1a3a6B,#4a7ab5)">L</div>
+          <div class="post-meta">
+            <div class="post-author">Léa_Mixologue</div>
+            <div class="post-time">Il y a 5 heures · Lyon</div>
+          </div>
+          <span class="post-badge">Mixologue</span>
+        </div>
+        <div class="post-img tall" style="font-size:6rem; background:linear-gradient(135deg,#001a0a,#003320);">🌺</div>
+        <div class="post-body">
+          <div class="post-cocktail-name">Venus Tropicale</div>
+          <div class="post-desc">Ma version du Porn Star Martini avec une touche d'hibiscus et gingembre frais. Les fruits de la passion venaient directement du marché ce matin. Le Prosecco à côté, toujours ! ✨</div>
+          <div class="post-ingredients">
+            <span class="ingr">Vodka Vanille</span>
+            <span class="ingr">Passoa</span>
+            <span class="ingr">Hibiscus</span>
+            <span class="ingr">Gingembre</span>
+            <span class="ingr">Prosecco</span>
+          </div>
+        </div>
+        <div class="post-actions">
+          <button class="action-btn liked" onclick="toggleLike(this)"><span class="action-icon">❤️</span> <span class="like-count">189</span></button>
+          <button class="action-btn" onclick="toggleComments('c2')"><span class="action-icon">💬</span> 9 commentaires</button>
+          <button class="action-btn" onclick="toggleSave(this)"><span class="action-icon">🔖</span> Sauvegarder</button>
+          <button class="action-btn" style="margin-left:auto"><span class="action-icon">↗️</span> Partager</button>
+        </div>
+        <div class="comments-section" id="c2" style="display:none">
+          <div class="comment">
+            <div class="comment-avatar">⚔️</div>
+            <div class="comment-body">
+              <div class="comment-author">Damoclès</div>
+              <div class="comment-text">L'hibiscus avec le Passoa c'est audacieux, j'adore l'idée ! 🌺</div>
+              <div class="comment-time">il y a 3h</div>
+            </div>
+          </div>
+          <div class="comment-input-row">
+            <input class="comment-input" placeholder="Votre commentaire..." id="ci2">
+            <button class="comment-send" onclick="addComment('c2','ci2')">Envoyer</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Post 3 -->
+      <div class="post-card">
+        <div class="post-header">
+          <div class="avatar" style="background:linear-gradient(135deg,#3a1a00,#8B3a00)">A</div>
+          <div class="post-meta">
+            <div class="post-author">Antoine_Bartender</div>
+            <div class="post-time">Hier · Marseille</div>
+          </div>
+          <span class="post-badge">Amateur passionné</span>
+        </div>
+        <div class="post-img" style="font-size:6rem; background:linear-gradient(135deg,#0a0a1a,#1a1a3a);">🌊</div>
+        <div class="post-body">
+          <div class="post-cocktail-name">Negroni Revisité</div>
+          <div class="post-desc">J'ai remplacé le Campari classique par un Aperol pour un Negroni plus doux. Ajout d'une tranche de pamplemousse grillée sur le bord du verre. Simple mais efficace ! 🍊</div>
+          <div class="post-ingredients">
+            <span class="ingr">Gin</span>
+            <span class="ingr">Aperol</span>
+            <span class="ingr">Vermouth Rouge</span>
+            <span class="ingr">Pamplemousse</span>
+          </div>
+        </div>
+        <div class="post-actions">
+          <button class="action-btn" onclick="toggleLike(this)"><span class="action-icon">🤍</span> <span class="like-count">94</span></button>
+          <button class="action-btn" onclick="toggleComments('c3')"><span class="action-icon">💬</span> 5 commentaires</button>
+          <button class="action-btn" onclick="toggleSave(this)"><span class="action-icon">🔖</span> Sauvegarder</button>
+          <button class="action-btn" style="margin-left:auto"><span class="action-icon">↗️</span> Partager</button>
+        </div>
+        <div class="comments-section" id="c3" style="display:none">
+          <div class="comment-input-row">
+            <input class="comment-input" placeholder="Votre commentaire..." id="ci3">
+            <button class="comment-send" onclick="addComment('c3','ci3')">Envoyer</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /feed -->
+
+    <!-- JOBS PAGE -->
+    <div id="page-jobs" class="page">
+      <div class="jobs-header">
+        <h1 class="jobs-title">Offres d'emploi</h1>
+        <p class="jobs-sub">Trouvez votre prochain poste · Bartender, chef barman, animateur cocktails...</p>
+        <div class="jobs-filters">
+          <button class="filter-btn active" onclick="filterJobs('all',this)">Toutes</button>
+          <button class="filter-btn" onclick="filterJobs('long',this)">CDI / Long terme</button>
+          <button class="filter-btn" onclick="filterJobs('short',this)">CDD / Court terme</button>
+          <button class="filter-btn" onclick="filterJobs('event',this)">Événement</button>
+          <button class="filter-btn" onclick="filterJobs('paris',this)">Paris</button>
+          <button class="filter-btn" onclick="filterJobs('lyon',this)">Lyon</button>
+        </div>
+      </div>
+
+      <button class="post-job-btn" onclick="openJobModal()">+ Publier une offre d'emploi</button>
+
+      <div id="jobs-list">
+
+        <div class="job-card" data-type="long" data-city="paris">
+          <div class="job-top">
+            <div>
+              <div class="job-title">Chef Barman – Bar à cocktails haut de gamme</div>
+              <div class="job-company">🍸 DAMOCLÈS Bar — Paris 2ème</div>
+            </div>
+            <span class="job-type long">CDI</span>
+          </div>
+          <div class="job-desc">Nous recherchons un Chef Barman créatif et expérimenté pour rejoindre notre équipe. Vous serez responsable de la carte cocktails, de la formation de l'équipe et de la relation client. Minimum 3 ans d'expérience en bar premium requis.</div>
+          <div class="job-tags">
+            <span class="job-tag">Cocktails premium</span>
+            <span class="job-tag">Management</span>
+            <span class="job-tag">Carte créative</span>
+            <span class="job-tag">Expérience 3 ans+</span>
+          </div>
+          <div class="job-bottom">
+            <div class="job-info">
+              <div class="job-info-item">📍 Paris 2ème</div>
+              <div class="job-info-item">💰 2800–3500€/mois</div>
+              <div class="job-info-item">🕐 Il y a 1 jour</div>
+            </div>
+            <button class="btn-apply" onclick="showToast('Candidature envoyée ! ✅')">Postuler</button>
+          </div>
+        </div>
+
+        <div class="job-card" data-type="short" data-city="paris">
+          <div class="job-top">
+            <div>
+              <div class="job-title">Bartender – Soirée privée de mariage</div>
+              <div class="job-company">🎊 Événements Prestige — Paris / Versailles</div>
+            </div>
+            <span class="job-type short">CDD</span>
+          </div>
+          <div class="job-desc">Mission d'une journée (samedi 21 juin) pour assurer le bar lors d'un mariage de 150 personnes à Versailles. Service cocktails et bar à champagne. Tenue fournie, transport remboursé.</div>
+          <div class="job-tags">
+            <span class="job-tag">1 journée</span>
+            <span class="job-tag">Mariage</span>
+            <span class="job-tag">150 personnes</span>
+            <span class="job-tag">Versailles</span>
+          </div>
+          <div class="job-bottom">
+            <div class="job-info">
+              <div class="job-info-item">📍 Versailles</div>
+              <div class="job-info-item">💰 250€/jour</div>
+              <div class="job-info-item">🕐 Il y a 3 heures</div>
+            </div>
+            <button class="btn-apply" onclick="showToast('Candidature envoyée ! ✅')">Postuler</button>
+          </div>
+        </div>
+
+        <div class="job-card" data-type="event" data-city="lyon">
+          <div class="job-top">
+            <div>
+              <div class="job-title">Animateur Masterclass Cocktails</div>
+              <div class="job-company">🎓 Cocktail Academy Lyon</div>
+            </div>
+            <span class="job-type event">Événement</span>
+          </div>
+          <div class="job-desc">Recherche un bartender pédagogue pour animer des masterclasses cocktails le week-end (2–3 fois par mois). Public de particuliers de niveau débutant à intermédiaire. Formation au concept assurée.</div>
+          <div class="job-tags">
+            <span class="job-tag">Masterclass</span>
+            <span class="job-tag">Week-end</span>
+            <span class="job-tag">Pédagogie</span>
+            <span class="job-tag">Freelance</span>
+          </div>
+          <div class="job-bottom">
+            <div class="job-info">
+              <div class="job-info-item">📍 Lyon 6ème</div>
+              <div class="job-info-item">💰 180€/session</div>
+              <div class="job-info-item">🕐 Il y a 2 jours</div>
+            </div>
+            <button class="btn-apply" onclick="showToast('Candidature envoyée ! ✅')">Postuler</button>
+          </div>
+        </div>
+
+        <div class="job-card" data-type="long" data-city="paris">
+          <div class="job-top">
+            <div>
+              <div class="job-title">Bartender – Hôtel 5 étoiles</div>
+              <div class="job-company">🏨 Le Grand Palace — Paris 8ème</div>
+            </div>
+            <span class="job-type long">CDI</span>
+          </div>
+          <div class="job-desc">Poste en CDI pour bartender expérimenté dans un palace parisien. Service en anglais requis. Vous rejoindrez une équipe de 6 personnes dans un bar lounge de référence internationale.</div>
+          <div class="job-tags">
+            <span class="job-tag">Palace</span>
+            <span class="job-tag">Anglais requis</span>
+            <span class="job-tag">Luxe</span>
+            <span class="job-tag">Expérience 2 ans+</span>
+          </div>
+          <div class="job-bottom">
+            <div class="job-info">
+              <div class="job-info-item">📍 Paris 8ème</div>
+              <div class="job-info-item">💰 2400–2900€/mois</div>
+              <div class="job-info-item">🕐 Il y a 4 jours</div>
+            </div>
+            <button class="btn-apply" onclick="showToast('Candidature envoyée ! ✅')">Postuler</button>
+          </div>
+        </div>
+
+        <div class="job-card" data-type="event" data-city="paris">
+          <div class="job-top">
+            <div>
+              <div class="job-title">Bar Manager – Festival d'été</div>
+              <div class="job-company">🎪 Sunnyside Festival — Île-de-France</div>
+            </div>
+            <span class="job-type event">Événement</span>
+          </div>
+          <div class="job-desc">Pour notre festival de musique de 3 jours (juillet), nous cherchons un Bar Manager pour coordonner 8 bartenders. Gestion des stocks, briefing équipe, relation prestataires. Logement sur site inclus.</div>
+          <div class="job-tags">
+            <span class="job-tag">Festival</span>
+            <span class="job-tag">3 jours</span>
+            <span class="job-tag">Management</span>
+            <span class="job-tag">Logement inclus</span>
+          </div>
+          <div class="job-bottom">
+            <div class="job-info">
+              <div class="job-info-item">📍 Île-de-France</div>
+              <div class="job-info-item">💰 800€ + logement</div>
+              <div class="job-info-item">🕐 Il y a 6 heures</div>
+            </div>
+            <button class="btn-apply" onclick="showToast('Candidature envoyée ! ✅')">Postuler</button>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /jobs -->
+
+    <!-- POST PAGE -->
+    <div id="page-post" class="page">
+      <h2 style="margin-bottom:6px;font-size:1.5rem">Partager un cocktail</h2>
+      <p style="color:var(--gray);font-size:0.85rem;margin-bottom:24px">Partagez votre création ou votre recette avec la communauté</p>
+      <div class="create-box">
+        <div class="create-title">✦ Nouvelle publication</div>
+        <div class="create-upload" onclick="showToast('Sélection de photo — bientôt disponible 📸')">
+          <div class="create-upload-icon">📸</div>
+          <div class="create-upload-text">Cliquez pour ajouter une photo de votre cocktail</div>
+        </div>
+        <input class="input-field" placeholder="Nom du cocktail *" id="new-name">
+        <textarea class="input-field" placeholder="Description, anecdote, occasion... *" rows="3" id="new-desc" style="resize:none;"></textarea>
+        <input class="input-field" placeholder="Ingrédients (séparés par des virgules)" id="new-ingr">
+        <div class="input-row">
+          <input class="input-field" placeholder="Votre ville" id="new-city">
+          <input class="input-field" placeholder="Votre pseudo" id="new-author">
+        </div>
+        <textarea class="input-field" placeholder="Recette / étapes de préparation (optionnel)" rows="3" style="resize:none;"></textarea>
+        <button class="btn-submit" onclick="submitPost()">Publier sur le feed ✦</button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- RIGHT PANEL -->
+  <aside class="right-panel">
+    <div class="widget">
+      <div class="widget-title">🔥 Tendances</div>
+      <div class="trending-item"><span class="trending-num">1</span><span class="trending-name">#EspressoMartini</span><span class="trending-count">1.2k posts</span></div>
+      <div class="trending-item"><span class="trending-num">2</span><span class="trending-name">#NegroniWeek</span><span class="trending-count">890 posts</span></div>
+      <div class="trending-item"><span class="trending-num">3</span><span class="trending-name">#SpritzSeason</span><span class="trending-count">654 posts</span></div>
+      <div class="trending-item"><span class="trending-num">4</span><span class="trending-name">#CocktailMaison</span><span class="trending-count">432 posts</span></div>
+      <div class="trending-item"><span class="trending-num">5</span><span class="trending-name">#MocktailVibes</span><span class="trending-count">318 posts</span></div>
+    </div>
+    <div class="widget">
+      <div class="widget-title">👨‍🍳 Bartenders à suivre</div>
+      <div class="bartender-item">
+        <div class="bartender-avatar">🍸</div>
+        <div style="flex:1"><div class="bartender-name">Damoclès</div><div class="bartender-city">Paris · 2.4k abonnés</div></div>
+        <button class="btn-follow">Suivre</button>
+      </div>
+      <div class="bartender-item">
+        <div class="bartender-avatar">🌿</div>
+        <div style="flex:1"><div class="bartender-name">Marco_B</div><div class="bartender-city">Bordeaux · 1.1k</div></div>
+        <button class="btn-follow">Suivre</button>
+      </div>
+      <div class="bartender-item">
+        <div class="bartender-avatar">🔥</div>
+        <div style="flex:1"><div class="bartender-name">Sofia_Mix</div><div class="bartender-city">Nice · 876</div></div>
+        <button class="btn-follow">Suivre</button>
+      </div>
+    </div>
+    <div class="widget">
+      <div class="widget-title">💼 Dernières offres</div>
+      <div style="font-size:0.8rem;color:var(--gray);line-height:2">
+        <div style="color:var(--white);margin-bottom:2px">Chef Barman – CDI</div>
+        <div style="font-size:0.7rem">DAMOCLÈS · Paris · il y a 1j</div>
+        <br>
+        <div style="color:var(--white);margin-bottom:2px">Bartender Mariage</div>
+        <div style="font-size:0.7rem">Événements Prestige · Versailles · 3h</div>
+        <br>
+        <a style="color:var(--gold);font-size:0.7rem;letter-spacing:0.1em;cursor:pointer" onclick="showPage('jobs',null)">Voir toutes les offres →</a>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- MODAL LOGIN/REGISTER -->
+<div class="modal-overlay" id="modal" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title">Bienvenue sur SHAKER</div>
+    <div class="modal-sub">La communauté des passionnés de cocktails</div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" onclick="switchTab(this,'login')">Connexion</button>
+      <button class="modal-tab" onclick="switchTab(this,'register')">Inscription</button>
+    </div>
+    <div id="login-form">
+      <input class="input-field" placeholder="Email" type="email">
+      <input class="input-field" placeholder="Mot de passe" type="password">
+      <button class="btn-submit" onclick="showToast('Connexion réussie ! 🍸'); closeModal()">Se connecter</button>
+    </div>
+    <div id="register-form" style="display:none">
+      <input class="input-field" placeholder="Prénom & Nom">
+      <input class="input-field" placeholder="Pseudo (ex: damocles_bar)">
+      <input class="input-field" placeholder="Email" type="email">
+      <input class="input-field" placeholder="Mot de passe" type="password">
+      <select class="input-field" style="color:var(--gray);background:transparent;cursor:pointer">
+        <option value="" disabled selected>Je suis...</option>
+        <option>Bartender professionnel</option>
+        <option>Mixologue</option>
+        <option>Amateur passionné</option>
+        <option>Recruteur / Établissement</option>
+      </select>
+      <button class="btn-submit" onclick="showToast('Bienvenue sur SHAKER ! 🎉'); closeModal()">Créer mon compte</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// Page navigation
+function showPage(page, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  if (btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+}
+
+// Like toggle
+function toggleLike(btn) {
+  const count = btn.querySelector('.like-count');
+  const icon = btn.querySelector('.action-icon');
+  const liked = btn.classList.toggle('liked');
+  icon.textContent = liked ? '❤️' : '🤍';
+  count.textContent = liked ? parseInt(count.textContent) + 1 : parseInt(count.textContent) - 1;
+}
+
+// Save toggle
+function toggleSave(btn) {
+  const saved = btn.classList.toggle('saved');
+  btn.querySelector('.action-icon').textContent = saved ? '🔖' : '🔖';
+  btn.style.color = saved ? 'var(--gold)' : '';
+  showToast(saved ? 'Sauvegardé ! 🔖' : 'Retiré des sauvegardes');
+}
+
+// Comments toggle
+function toggleComments(id) {
+  const el = document.getElementById(id);
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+// Add comment
+function addComment(sectionId, inputId) {
+  const input = document.getElementById(inputId);
+  if (!input.value.trim()) return;
+  const section = document.getElementById(sectionId);
+  const row = section.querySelector('.comment-input-row');
+  const div = document.createElement('div');
+  div.className = 'comment';
+  div.innerHTML = `<div class="comment-avatar">👤</div><div class="comment-body"><div class="comment-author">Vous</div><div class="comment-text">${input.value}</div><div class="comment-time">À l'instant</div></div>`;
+  section.insertBefore(div, row);
+  input.value = '';
+  showToast('Commentaire publié ! 💬');
+}
+
+// Submit post
+function submitPost() {
+  const name = document.getElementById('new-name').value;
+  const desc = document.getElementById('new-desc').value;
+  const author = document.getElementById('new-author').value || 'Anonyme';
+  if (!name || !desc) { showToast('Remplissez les champs obligatoires ⚠️'); return; }
+  showToast(`"${name}" publié sur le feed ! 🍸`);
+  showPage('feed', document.querySelector('.tab-btn'));
+  document.querySelector('.tab-btn').classList.add('active');
+}
+
+// Jobs filter
+function filterJobs(type, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.job-card').forEach(card => {
+    if (type === 'all') { card.style.display = 'block'; return; }
+    const match = card.dataset.type === type || card.dataset.city === type;
+    card.style.display = match ? 'block' : 'none';
+  });
+}
+
+// Modal
+function openModal() { document.getElementById('modal').classList.add('open'); }
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+function closeModalOutside(e) { if (e.target.id === 'modal') closeModal(); }
+function openJobModal() { showToast('Formulaire offre d\'emploi — bientôt disponible ! 💼'); }
+function switchTab(btn, tab) {
+  document.querySelectorAll('.modal-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('register-form').style.display = tab === 'register' ? 'block' : 'none';
+}
+
+// Toast
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
