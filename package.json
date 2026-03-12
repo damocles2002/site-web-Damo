@@ -1,8 +1,7 @@
 {
   "name": "site-web-damo",
   "version": "1.0.0",
-  "description": "Mon site web",
   "scripts": {
-    "test": "echo \"Tests OK\" && exit 0"
+    "test": "echo OK"
   }
 }
